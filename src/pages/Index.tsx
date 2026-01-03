@@ -1,59 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
-const iceCreamProducts = [
-  {
-    id: 1,
-    name: 'Клубничный рожон',
-    description: 'Нежное клубничное мороженое в хрустящем вафельном рожке',
-    price: 150,
-    image: 'https://cdn.poehali.dev/projects/47d6713c-82b0-4e8b-bf61-58c73c244bba/files/4b7ba8db-f3cf-45f7-8bb5-50b6edfcd18e.jpg',
-    popular: true
-  },
-  {
-    id: 2,
-    name: 'Шоколадный сундей',
-    description: 'Три шарика шоколадного мороженого с топпингом и вишенкой',
-    price: 250,
-    image: 'https://cdn.poehali.dev/projects/47d6713c-82b0-4e8b-bf61-58c73c244bba/files/4175730e-5820-45d9-9013-0a00f0cde714.jpg',
-    popular: false
-  },
-  {
-    id: 3,
-    name: 'Фруктовый лёд',
-    description: 'Освежающее эскимо из натуральных фруктов',
-    price: 100,
-    image: 'https://cdn.poehali.dev/projects/47d6713c-82b0-4e8b-bf61-58c73c244bba/files/d5e5a70d-1a94-4023-9781-554b06a1e6a2.jpg',
-    popular: true
-  },
-  {
-    id: 4,
-    name: 'Ванильный пломбир',
-    description: 'Классическое сливочное мороженое с натуральной ванилью',
-    price: 120,
-    image: 'https://cdn.poehali.dev/projects/47d6713c-82b0-4e8b-bf61-58c73c244bba/files/4b7ba8db-f3cf-45f7-8bb5-50b6edfcd18e.jpg',
-    popular: false
-  },
-  {
-    id: 5,
-    name: 'Манго-маракуйя',
-    description: 'Экзотическое сочетание тропических фруктов',
-    price: 180,
-    image: 'https://cdn.poehali.dev/projects/47d6713c-82b0-4e8b-bf61-58c73c244bba/files/d5e5a70d-1a94-4023-9781-554b06a1e6a2.jpg',
-    popular: true
-  },
-  {
-    id: 6,
-    name: 'Мятное облако',
-    description: 'Освежающее мятное мороженое с шоколадной крошкой',
-    price: 160,
-    image: 'https://cdn.poehali.dev/projects/47d6713c-82b0-4e8b-bf61-58c73c244bba/files/4175730e-5820-45d9-9013-0a00f0cde714.jpg',
-    popular: false
-  }
-];
+const API_URL = 'https://functions.poehali.dev/4f749033-06de-4e79-9f49-aab1f375c4ad';
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image_url: string;
+  popular: boolean;
+}
 
 const reviews = [
   {
@@ -78,6 +38,18 @@ const reviews = [
 
 export default function Index() {
   const [activeSection, setActiveSection] = useState('catalog');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
   const scrollToSection = (section: string) => {
     setActiveSection(section);
@@ -148,7 +120,11 @@ export default function Index() {
             <p className="text-lg text-foreground/70">Каждый день свежее мороженое от лучших производителей</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {iceCreamProducts.map((product, index) => (
+            {loading ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-xl text-foreground/70">Загрузка каталога...</p>
+              </div>
+            ) : products.map((product, index) => (
               <Card 
                 key={product.id} 
                 className="hover-lift overflow-hidden border-2 border-border animate-fade-in"
@@ -156,7 +132,7 @@ export default function Index() {
               >
                 <div className="relative">
                   <img 
-                    src={product.image} 
+                    src={product.image_url} 
                     alt={product.name}
                     className="w-full h-64 object-cover"
                   />

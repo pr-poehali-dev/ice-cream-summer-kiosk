@@ -1,0 +1,27 @@
+{
+  "tests": [
+    {
+      "name": "Get all products",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Create new product",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "name": "Тестовое мороженое",
+        "description": "Описание тестового мороженого",
+        "price": 200,
+        "popular": true
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "name": "Тестовое мороженое",
+        "price": 200
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
